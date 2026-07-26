@@ -514,13 +514,8 @@
     const resetBtn = document.getElementById('reset-btn');
     const gameTitle = document.getElementById('game-title');
     const body = document.body;
-
-    /* ============================================
-       工具函数：同时监听 click 和 touchstart
-       消除移动端 300ms 延迟
-       ============================================ */
+    
     function addTouchClick(el, handler) {
-      // 标记是否已触发，防止 click 和 touchstart 重复执行
       let triggered = false;
 
       const onTouch = (e) => {
@@ -561,10 +556,8 @@
        更新小猫位置（GPU加速）
        ============================================ */
     function updateCatTransform() {
-      // 使用 CSS 变量保存当前位置，供动画关键帧引用
       catContainer.style.setProperty('--x', STATE.posX + 'px');
       catContainer.style.setProperty('--y', STATE.posY + 'px');
-      // 直接设置 transform 覆盖呼吸动画的偏移
       const breatheOffset = Math.sin(Date.now() / 1000 * Math.PI) * -8;
       catContainer.style.transform = `translate3d(${STATE.posX}px, ${STATE.posY + breatheOffset}px, 0)`;
     }
@@ -757,7 +750,6 @@
           if (playPromise !== undefined) {
             playPromise.catch(err => {
               console.log('视频自动播放被阻止，等待用户交互:', err);
-              // 某些浏览器可能需要用户手势才能播放带声音的视频
               document.addEventListener('click', function onceClick() {
                 scareVideo.play();
                 document.removeEventListener('click', onceClick);
@@ -853,7 +845,7 @@
       // 绑定重置按钮
       addTouchClick(resetBtn, resetGame);
 
-      // 确保小猫视频播放（某些浏览器 autoplay 可能被阻止）
+      // 确保小猫视频播放
       catVideo.play().catch(() => {
         document.addEventListener('click', function firstClick() {
           catVideo.play();
