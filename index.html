@@ -2,13 +2,9 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <!-- 视口设置：禁止缩放，适配移动端 -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>抓住游荡的小猫</title>
   <style>
-    /* ============================================
-       全局重置与移动端防滚动
-       ============================================ */
     *, *::before, *::after {
       margin: 0;
       padding: 0;
@@ -20,7 +16,6 @@
       width: 100%;
       height: 100%;
       overflow: hidden;
-      /* 禁止橡皮筋回弹和触摸默认行为 */
       overscroll-behavior: none;
       touch-action: none;
       position: fixed;
@@ -29,9 +24,6 @@
       font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
     }
 
-    /* ============================================
-       童话绘本风格背景
-       ============================================ */
     #fairy-tale-bg {
       position: fixed;
       top: 0;
@@ -43,7 +35,6 @@
       transition: filter 0.5s ease, opacity 0.5s ease;
     }
 
-    /* 波点纹理 */
     #fairy-tale-bg::before {
       content: "";
       position: absolute;
@@ -56,7 +47,6 @@
       opacity: 0.5;
     }
 
-    /* 云朵装饰 - CSS绘制 */
     .cloud {
       position: absolute;
       background: #fff;
@@ -99,7 +89,6 @@
       100% { transform: translateX(calc(100vw + 200px)); }
     }
 
-    /* 漂浮小星星 */
     .star {
       position: absolute;
       color: #FFD700;
@@ -112,9 +101,6 @@
       50% { opacity: 1; transform: scale(1.2); }
     }
 
-    /* ============================================
-       标题
-       ============================================ */
     #game-title {
       position: fixed;
       top: 30px;
@@ -131,16 +117,12 @@
       transition: opacity 0.3s ease;
     }
 
-    /* ============================================
-       小猫容器（DVD弹跳）
-       ============================================ */
     #cat-container {
       position: fixed;
       width: 120px;
       height: 120px;
       z-index: 20;
       cursor: pointer;
-      /* GPU加速 */
       will-change: transform;
       transform: translate3d(0, 0, 0);
     }
@@ -150,12 +132,10 @@
       height: 100%;
       object-fit: cover;
       border-radius: 50%;
-      /* 绿色描边效果 */
       box-shadow: 0 0 0 3px #00FF41, 0 0 20px rgba(0,255,65,0.3);
       pointer-events: none;
     }
 
-    /* 呼吸感上下浮动 */
     #cat-container {
       animation: breathe 2s ease-in-out infinite;
     }
@@ -164,7 +144,6 @@
       50% { transform: translate3d(var(--x, 0px), var(--y, 0px), 0) translateY(-8px); }
     }
 
-    /* 点击弹跳动画 */
     .cat-bounce {
       animation: catBounce 0.8s ease !important;
     }
@@ -176,9 +155,6 @@
       100% { transform: translate3d(var(--x, 0px), var(--y, 0px), 0) scale(1); }
     }
 
-    /* ============================================
-       星星拖尾特效
-       ============================================ */
     .trail-star {
       position: fixed;
       width: 12px;
@@ -200,9 +176,6 @@
       100% { opacity: 0; transform: scale(2) translateY(-20px); }
     }
 
-    /* ============================================
-       对话气泡
-       ============================================ */
     .bubble {
       position: fixed;
       padding: 12px 18px;
@@ -221,7 +194,6 @@
       opacity: 1;
       transform: translate(-50%, -120%) scale(1);
     }
-    /* 气泡小三角 */
     .bubble::after {
       content: "";
       position: absolute;
@@ -236,7 +208,6 @@
       border-left-color: transparent;
     }
 
-    /* 第1次 - 浅黄 */
     .bubble-yellow {
       background: #FFF9C4;
       color: #F57F17;
@@ -244,7 +215,6 @@
     }
     .bubble-yellow::after { border-top-color: #FFF9C4; }
 
-    /* 第2次 - 薄荷绿 */
     .bubble-green {
       background: #B2DFDB;
       color: #00695C;
@@ -252,7 +222,6 @@
     }
     .bubble-green::after { border-top-color: #B2DFDB; }
 
-    /* 第3次 - 灰色 */
     .bubble-gray {
       background: #BDBDBD;
       color: #424242;
@@ -267,9 +236,6 @@
       75% { transform: translate(-50%, -120%) scale(1) translateX(3px); }
     }
 
-    /* ============================================
-       恐怖阶段 - 遮罩与氛围
-       ============================================ */
     #horror-overlay {
       position: fixed;
       top: 0;
@@ -286,7 +252,6 @@
       pointer-events: auto;
     }
 
-    /* 故障艺术效果 */
     .glitch {
       animation: glitch 0.2s infinite;
       filter: hue-rotate(90deg) saturate(3);
@@ -300,9 +265,6 @@
       100% { transform: translate3d(var(--x, 0px), var(--y, 0px), 0) translate(0); clip-path: inset(10% 0 60% 0); }
     }
 
-    /* ============================================
-       恐怖突脸视频
-       ============================================ */
     #scare-video {
       position: fixed;
       top: 0;
@@ -314,9 +276,6 @@
       display: none;
     }
 
-    /* ============================================
-       屏幕震动
-       ============================================ */
     .screen-shake {
       animation: screenShake 0.1s infinite;
     }
@@ -334,9 +293,6 @@
       100% { transform: translate(0, 0); }
     }
 
-    /* ============================================
-       血红色闪烁警示光
-       ============================================ */
     #blood-flash {
       position: fixed;
       top: 0;
@@ -357,9 +313,6 @@
       50% { box-shadow: inset 0 0 120px 40px rgba(255, 0, 0, 0.6); }
     }
 
-    /* ============================================
-       黑屏过渡
-       ============================================ */
     #black-screen {
       position: fixed;
       top: 0;
@@ -373,9 +326,6 @@
       transition: opacity 0.05s ease;
     }
 
-    /* ============================================
-       重置按钮（暗黑/血迹风格）
-       ============================================ */
     #reset-btn {
       position: fixed;
       top: 50%;
@@ -404,9 +354,6 @@
       transform: translate(-50%, -50%) scale(0.95);
     }
 
-    /* ============================================
-       恐怖阶段隐藏指针
-       ============================================ */
     .hide-cursor {
       cursor: none !important;
     }
@@ -414,9 +361,6 @@
       cursor: none !important;
     }
 
-    /* ============================================
-       背景褪色效果
-       ============================================ */
     .bg-fade {
       filter: grayscale(0.7) brightness(0.6) !important;
     }
@@ -425,12 +369,10 @@
 </head>
 <body>
 
-  <!-- ========== 童话背景 ========== -->
   <div id="fairy-tale-bg">
     <div class="cloud cloud1"></div>
     <div class="cloud cloud2"></div>
     <div class="cloud cloud3"></div>
-    <!-- 漂浮小星星 -->
     <div class="star" style="top:15%;left:20%;animation-delay:0s;">✨</div>
     <div class="star" style="top:30%;left:70%;animation-delay:0.5s;">⭐</div>
     <div class="star" style="top:50%;left:15%;animation-delay:1s;">✨</div>
@@ -439,15 +381,9 @@
     <div class="star" style="top:20%;left:85%;animation-delay:0.8s;">⭐</div>
   </div>
 
-  <!-- ========== 标题 ========== -->
-  <div id="game-title">🐱 抓小猫大冒险 🌟</div>
+  <div id="game-title">🐱 抓住游荡的小猫 🌟</div>
 
-  <!-- ========== 小猫容器 ========== -->
   <div id="cat-container">
-    <!-- 
-      小猫视频：必须静音、循环、内联播放
-      playsinline / webkit-playsinline 防止iOS/Android自动全屏
-    -->
     <video
       id="cat-video"
       src="cat.mp4"
@@ -460,18 +396,10 @@
     ></video>
   </div>
 
-  <!-- ========== 对话气泡（动态创建） ========== -->
-
-  <!-- ========== 恐怖遮罩 ========== -->
   <div id="horror-overlay"></div>
-
-  <!-- ========== 黑屏过渡 ========== -->
   <div id="black-screen"></div>
-
-  <!-- ========== 血红色闪烁 ========== -->
   <div id="blood-flash"></div>
 
-  <!-- ========== 恐怖突脸视频 ========== -->
   <video
     id="scare-video"
     src="scare.mp4"
@@ -480,30 +408,23 @@
     preload="auto"
   ></video>
 
-  <!-- ========== 重置按钮 ========== -->
   <button id="reset-btn">🩸 重新挑战</button>
 
   <script>
-    /* ============================================
-       游戏状态与配置
-       ============================================ */
     const STATE = {
-      clickCount: 0,        // 点击计数
-      isHorror: false,      // 是否进入恐怖阶段
-      isPaused: false,      // 小猫是否暂停移动
-      catSize: 120,         // 小猫尺寸
-      speed: 3,             // 移动速度（像素/帧）
-      posX: 50,             // 当前X位置
-      posY: 50,             // 当前Y位置
-      dirX: 1,              // X方向（1或-1）
-      dirY: 1,              // Y方向（1或-1）
-      trailTimer: 0,        // 拖尾计时器
-      animId: null,         // requestAnimationFrame ID
+      clickCount: 0,
+      isHorror: false,
+      isPaused: false,
+      catSize: 120,
+      speed: 1.5,
+      posX: 50,
+      posY: 50,
+      dirX: 1,
+      dirY: 1,
+      trailTimer: 0,
+      animId: null,
     };
 
-    /* ============================================
-       DOM 元素引用
-       ============================================ */
     const catContainer = document.getElementById('cat-container');
     const catVideo = document.getElementById('cat-video');
     const scareVideo = document.getElementById('scare-video');
@@ -514,10 +435,9 @@
     const resetBtn = document.getElementById('reset-btn');
     const gameTitle = document.getElementById('game-title');
     const body = document.body;
-    
+
     function addTouchClick(el, handler) {
       let triggered = false;
-
       const onTouch = (e) => {
         e.preventDefault();
         if (!triggered) {
@@ -526,7 +446,6 @@
           setTimeout(() => { triggered = false; }, 300);
         }
       };
-
       const onClick = (e) => {
         if (!triggered) {
           triggered = true;
@@ -534,14 +453,10 @@
           setTimeout(() => { triggered = false; }, 300);
         }
       };
-
       el.addEventListener('touchstart', onTouch, { passive: false });
       el.addEventListener('click', onClick);
     }
 
-    /* ============================================
-       初始化小猫位置
-       ============================================ */
     function initCatPosition() {
       const maxX = window.innerWidth - STATE.catSize;
       const maxY = window.innerHeight - STATE.catSize;
@@ -552,9 +467,6 @@
       updateCatTransform();
     }
 
-    /* ============================================
-       更新小猫位置（GPU加速）
-       ============================================ */
     function updateCatTransform() {
       catContainer.style.setProperty('--x', STATE.posX + 'px');
       catContainer.style.setProperty('--y', STATE.posY + 'px');
@@ -562,22 +474,15 @@
       catContainer.style.transform = `translate3d(${STATE.posX}px, ${STATE.posY + breatheOffset}px, 0)`;
     }
 
-    /* ============================================
-       DVD 弹跳移动逻辑
-       ============================================ */
     function moveCat() {
       if (STATE.isPaused || STATE.isHorror) {
         STATE.animId = requestAnimationFrame(moveCat);
         return;
       }
-
       const maxX = window.innerWidth - STATE.catSize;
       const maxY = window.innerHeight - STATE.catSize;
-
       STATE.posX += STATE.speed * STATE.dirX;
       STATE.posY += STATE.speed * STATE.dirY;
-
-      // 边缘碰撞检测与反弹
       if (STATE.posX <= 0) {
         STATE.posX = 0;
         STATE.dirX = 1;
@@ -585,7 +490,6 @@
         STATE.posX = maxX;
         STATE.dirX = -1;
       }
-
       if (STATE.posY <= 0) {
         STATE.posY = 0;
         STATE.dirY = 1;
@@ -593,67 +497,44 @@
         STATE.posY = maxY;
         STATE.dirY = -1;
       }
-
       updateCatTransform();
-
-      // 生成拖尾星星（每5帧生成一个）
       STATE.trailTimer++;
       if (STATE.trailTimer % 5 === 0) {
         createTrailStar();
       }
-
       STATE.animId = requestAnimationFrame(moveCat);
     }
 
-    /* ============================================
-       创建拖尾星星
-       ============================================ */
     function createTrailStar() {
       const star = document.createElement('div');
       star.className = 'trail-star';
-      // 在小猫后方生成
       const offsetX = STATE.dirX * (-20) + (Math.random() - 0.5) * 20;
       const offsetY = STATE.dirY * (-20) + (Math.random() - 0.5) * 20;
       star.style.left = (STATE.posX + STATE.catSize / 2 + offsetX) + 'px';
       star.style.top = (STATE.posY + STATE.catSize / 2 + offsetY) + 'px';
       document.body.appendChild(star);
-
-      // 动画结束后移除
       setTimeout(() => {
         if (star.parentNode) star.parentNode.removeChild(star);
       }, 1000);
     }
 
-    /* ============================================
-       显示对话气泡
-       ============================================ */
     function showBubble(text, type) {
-      // 移除旧气泡
       const oldBubble = document.querySelector('.bubble');
       if (oldBubble) oldBubble.remove();
-
       const bubble = document.createElement('div');
       bubble.className = `bubble bubble-${type}`;
       bubble.textContent = text;
       document.body.appendChild(bubble);
-
-      // 定位到小猫上方
       const centerX = STATE.posX + STATE.catSize / 2;
       const topY = STATE.posY;
       bubble.style.left = centerX + 'px';
       bubble.style.top = topY + 'px';
-
-      // 触发动画
       requestAnimationFrame(() => {
         bubble.classList.add('show');
       });
-
       return bubble;
     }
 
-    /* ============================================
-       隐藏气泡
-       ============================================ */
     function hideBubble() {
       const bubble = document.querySelector('.bubble');
       if (bubble) {
@@ -664,46 +545,32 @@
       }
     }
 
-    /* ============================================
-       处理点击小猫
-       ============================================ */
     function handleCatClick(e) {
       if (STATE.isHorror || STATE.isPaused) return;
-
       STATE.clickCount++;
       STATE.isPaused = true;
-
-      // 弹跳动画
       catContainer.classList.add('cat-bounce');
       setTimeout(() => {
         catContainer.classList.remove('cat-bounce');
       }, 800);
-
       if (STATE.clickCount === 1) {
-        // 第1次点击
         showBubble('真乖~ 摸摸头 🐾', 'yellow');
         setTimeout(() => {
           hideBubble();
           STATE.isPaused = false;
         }, 2000);
       } else if (STATE.clickCount === 2) {
-        // 第2次点击
         showBubble('别跑嘛，再玩会儿~ 😻', 'green');
         setTimeout(() => {
           hideBubble();
           STATE.isPaused = false;
         }, 2000);
       } else if (STATE.clickCount === 3) {
-        // 第3次点击 - 氛围突变
         showBubble('诶？怎么...', 'gray');
-
-        // 背景开始褪色
         setTimeout(() => {
           fairyBg.classList.add('bg-fade');
           gameTitle.style.opacity = '0.3';
         }, 500);
-
-        // 气泡消失后延迟1.5秒触发Jump Scare
         setTimeout(() => {
           hideBubble();
           setTimeout(triggerJumpScare, 1500);
@@ -711,89 +578,52 @@
       }
     }
 
-    /* ============================================
-       Jump Scare 恐怖突脸
-       ============================================ */
     function triggerJumpScare() {
       STATE.isHorror = true;
-
-      // 1. 氛围突变：遮罩变暗
       horrorOverlay.classList.add('active');
-
-      // 2. 小猫故障效果
       catContainer.classList.add('glitch');
-
-      // 3. 延迟后黑屏 -> 突脸
       setTimeout(() => {
-        // 黑屏0.2秒
         blackScreen.style.display = 'block';
         blackScreen.style.opacity = '1';
-
         setTimeout(() => {
-          // 隐藏小猫和童话元素
           catContainer.style.display = 'none';
           gameTitle.style.display = 'none';
           fairyBg.style.opacity = '0';
           horrorOverlay.style.background = 'rgba(0,0,0,1)';
-
-          // 显示恐怖视频
           blackScreen.style.opacity = '0';
           setTimeout(() => {
             blackScreen.style.display = 'none';
           }, 50);
-
           scareVideo.style.display = 'block';
           scareVideo.currentTime = 0;
-
-          // 尝试播放（需处理自动播放策略）
+          scareVideo.playbackRate = 2.0;
           const playPromise = scareVideo.play();
           if (playPromise !== undefined) {
             playPromise.catch(err => {
-              console.log('视频自动播放被阻止，等待用户交互:', err);
               document.addEventListener('click', function onceClick() {
                 scareVideo.play();
                 document.removeEventListener('click', onceClick);
               }, { once: true });
             });
           }
-
-          // 屏幕震动
           body.classList.add('screen-shake');
-
-          // 血红色闪烁
           bloodFlash.classList.add('blood-flash-active');
-
-          // 隐藏指针
           body.classList.add('hide-cursor');
-
-        }, 200); // 黑屏0.2秒
-
-      }, 800); // 故障效果持续0.8秒
+        }, 200);
+      }, 800);
     }
 
-    /* ============================================
-       恐怖视频结束处理
-       ============================================ */
     scareVideo.addEventListener('ended', () => {
-      // 停止震动和闪烁
       body.classList.remove('screen-shake');
       bloodFlash.classList.remove('blood-flash-active');
-
-      // 显示重置按钮
       resetBtn.classList.add('show');
       body.classList.remove('hide-cursor');
     });
 
-    /* ============================================
-       重置游戏
-       ============================================ */
     function resetGame() {
-      // 重置状态
       STATE.clickCount = 0;
       STATE.isHorror = false;
       STATE.isPaused = false;
-
-      // 隐藏恐怖元素
       scareVideo.style.display = 'none';
       scareVideo.pause();
       scareVideo.currentTime = 0;
@@ -802,28 +632,17 @@
       horrorOverlay.style.background = 'rgba(0,0,0,0)';
       bloodFlash.classList.remove('blood-flash-active');
       body.classList.remove('screen-shake', 'hide-cursor');
-
-      // 恢复童话元素
       fairyBg.style.opacity = '1';
       fairyBg.classList.remove('bg-fade');
       gameTitle.style.display = 'block';
       gameTitle.style.opacity = '1';
-
-      // 恢复小猫
       catContainer.style.display = 'block';
       catContainer.classList.remove('glitch');
       catVideo.play();
-
-      // 重新初始化位置
       initCatPosition();
-
-      // 清除残留气泡
       hideBubble();
     }
 
-    /* ============================================
-       窗口大小变化适配
-       ============================================ */
     window.addEventListener('resize', () => {
       const maxX = window.innerWidth - STATE.catSize;
       const maxY = window.innerHeight - STATE.catSize;
@@ -832,20 +651,11 @@
       updateCatTransform();
     });
 
-    /* ============================================
-       初始化
-       ============================================ */
     function init() {
       initCatPosition();
       moveCat();
-
-      // 绑定小猫点击/触摸事件
       addTouchClick(catContainer, handleCatClick);
-
-      // 绑定重置按钮
       addTouchClick(resetBtn, resetGame);
-
-      // 确保小猫视频播放
       catVideo.play().catch(() => {
         document.addEventListener('click', function firstClick() {
           catVideo.play();
@@ -854,7 +664,6 @@
       });
     }
 
-    // DOM加载完成后启动
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', init);
     } else {
