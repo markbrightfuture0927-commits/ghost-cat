@@ -24,14 +24,6 @@
       font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
     }
 
-    .video-src {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      opacity: 0;
-      pointer-events: none;
-    }
-
     #fairy-tale-bg {
       position: fixed;
       top: 0;
@@ -144,6 +136,18 @@
       height: 100%;
       display: block;
       border-radius: 50%;
+    }
+
+    #cat-video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+      box-shadow: 0 0 0 3px #00FF41, 0 0 20px rgba(0,255,65,0.3);
+      display: none;
     }
 
     .cat-bounce {
@@ -277,6 +281,17 @@
       display: none;
     }
 
+    #scare-video {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      z-index: 50;
+      display: none;
+    }
+
     .screen-shake {
       animation: screenShake 0.1s infinite;
     }
@@ -370,9 +385,6 @@
 </head>
 <body>
 
-  <video id="cat-video-src" class="video-src" src="cat.mp4" muted loop playsinline webkit-playsinline x5-playsinline x5-video-player-type="h5" x5-video-player-fullscreen="false" preload="auto"></video>
-  <video id="scare-video-src" class="video-src" src="scare.mp4" playsinline webkit-playsinline x5-playsinline x5-video-player-type="h5" x5-video-player-fullscreen="false" preload="auto"></video>
-
   <div id="fairy-tale-bg">
     <div class="cloud cloud1"></div>
     <div class="cloud cloud2"></div>
@@ -389,6 +401,19 @@
 
   <div id="cat-container">
     <canvas id="cat-canvas" width="240" height="240"></canvas>
+    <video
+      id="cat-video"
+      src="cat.mp4"
+      autoplay
+      muted
+      loop
+      playsinline
+      webkit-playsinline
+      x5-playsinline
+      x5-video-player-type="h5"
+      x5-video-player-fullscreen="false"
+      preload="auto"
+    ></video>
   </div>
 
   <div id="horror-overlay"></div>
@@ -396,6 +421,16 @@
   <div id="blood-flash"></div>
 
   <canvas id="scare-canvas"></canvas>
+  <video
+    id="scare-video"
+    src="scare.mp4"
+    playsinline
+    webkit-playsinline
+    x5-playsinline
+    x5-video-player-type="h5"
+    x5-video-player-fullscreen="false"
+    preload="auto"
+  ></video>
 
   <button id="reset-btn">🩸 重新挑战</button>
 
@@ -413,16 +448,18 @@
       trailTimer: 0,
       animId: null,
       scareTimer: null,
+      catUseCanvas: true,
+      scareUseCanvas: true,
     };
 
     const catContainer = document.getElementById('cat-container');
     const catCanvas = document.getElementById('cat-canvas');
     const catCtx = catCanvas.getContext('2d');
-    const catVideoSrc = document.getElementById('cat-video-src');
+    const catVideo = document.getElementById('cat-video');
 
     const scareCanvas = document.getElementById('scare-canvas');
     const scareCtx = scareCanvas.getContext('2d');
-    const scareVideoSrc = document.getElementById('scare-video-src');
+    const scareVideo = document.getElementById('scare-video');
 
     const fairyBg = document.getElementById('fairy-tale-bg');
     const horrorOverlay = document.getElementById('horror-overlay');
@@ -445,14 +482,28 @@
       scareCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
 
+    function fallbackToCatVideo() {
+      STATE.catUseCanvas = false;
+      catCanvas.style.display = 'none';
+      catVideo.style.display = 'block';
+    }
+
+    function fallbackToScareVideo() {
+      STATE.scareUseCanvas = false;
+      scareCanvas.style.display = 'none';
+      scareVideo.style.display = 'block';
+    }
+
     function drawCatFrame() {
-      if (catVideoSrc.readyState >= 2) {
+      if (!STATE.catUseCanvas) return;
+      if (catVideo.readyState < 2) return;
+      try {
         catCtx.clearRect(0, 0, 120, 120);
         catCtx.save();
         catCtx.beginPath();
         catCtx.arc(60, 60, 58, 0, Math.PI * 2);
         catCtx.clip();
-        catCtx.drawImage(catVideoSrc, 0, 0, 120, 120);
+        catCtx.drawImage(catVideo, 0, 0, 120, 120);
         catCtx.restore();
         catCtx.shadowColor = 'rgba(0, 255, 65, 0.4)';
         catCtx.shadowBlur = 15;
@@ -462,13 +513,17 @@
         catCtx.arc(60, 60, 58, 0, Math.PI * 2);
         catCtx.stroke();
         catCtx.shadowBlur = 0;
+      } catch (e) {
+        fallbackToCatVideo();
       }
     }
 
     function drawScareFrame() {
-      if (scareVideoSrc.readyState >= 2 && !scareVideoSrc.paused) {
-        const vw = scareVideoSrc.videoWidth || 1;
-        const vh = scareVideoSrc.videoHeight || 1;
+      if (!STATE.scareUseCanvas) return;
+      if (scareVideo.readyState < 2 || scareVideo.paused) return;
+      try {
+        const vw = scareVideo.videoWidth || 1;
+        const vh = scareVideo.videoHeight || 1;
         const vr = vw / vh;
         const cw = window.innerWidth;
         const ch = window.innerHeight;
@@ -485,7 +540,9 @@
           dx = 0;
           dy = (ch - dh) / 2;
         }
-        scareCtx.drawImage(scareVideoSrc, dx, dy, dw, dh);
+        scareCtx.drawImage(scareVideo, dx, dy, dw, dh);
+      } catch (e) {
+        fallbackToScareVideo();
       }
     }
 
@@ -665,15 +722,19 @@
           setTimeout(() => {
             blackScreen.style.display = 'none';
           }, 50);
-          scareCanvas.style.display = 'block';
-          resizeScareCanvas();
-          scareVideoSrc.currentTime = 0;
-          scareVideoSrc.playbackRate = 2.0;
-          const playPromise = scareVideoSrc.play();
+          if (STATE.scareUseCanvas) {
+            scareCanvas.style.display = 'block';
+            resizeScareCanvas();
+          } else {
+            scareVideo.style.display = 'block';
+          }
+          scareVideo.currentTime = 0;
+          scareVideo.playbackRate = 2.0;
+          const playPromise = scareVideo.play();
           if (playPromise !== undefined) {
             playPromise.catch(() => {
               document.addEventListener('click', function onceClick() {
-                scareVideoSrc.play();
+                scareVideo.play();
                 document.removeEventListener('click', onceClick);
               }, { once: true });
             });
@@ -686,7 +747,7 @@
       }, 800);
     }
 
-    scareVideoSrc.addEventListener('ended', onScareEnd);
+    scareVideo.addEventListener('ended', onScareEnd);
 
     function resetGame() {
       STATE.clickCount = 0;
@@ -696,9 +757,10 @@
         clearTimeout(STATE.scareTimer);
         STATE.scareTimer = null;
       }
-      scareVideoSrc.pause();
-      scareVideoSrc.currentTime = 0;
+      scareVideo.pause();
+      scareVideo.currentTime = 0;
       scareCanvas.style.display = 'none';
+      scareVideo.style.display = 'none';
       resetBtn.classList.remove('show');
       horrorOverlay.classList.remove('active');
       horrorOverlay.style.background = 'rgba(0,0,0,0)';
@@ -710,7 +772,14 @@
       gameTitle.style.opacity = '1';
       catContainer.style.display = 'block';
       catContainer.classList.remove('glitch');
-      catVideoSrc.play();
+      if (STATE.catUseCanvas) {
+        catCanvas.style.display = 'block';
+        catVideo.style.display = 'none';
+      } else {
+        catCanvas.style.display = 'none';
+        catVideo.style.display = 'block';
+      }
+      catVideo.play();
       initCatPosition();
       hideBubble();
     }
@@ -731,9 +800,9 @@
       moveCat();
       addTouchClick(catContainer, handleCatClick);
       addTouchClick(resetBtn, resetGame);
-      catVideoSrc.play().catch(() => {
+      catVideo.play().catch(() => {
         document.addEventListener('click', function firstClick() {
-          catVideoSrc.play();
+          catVideo.play();
           document.removeEventListener('click', firstClick);
         }, { once: true });
       });
