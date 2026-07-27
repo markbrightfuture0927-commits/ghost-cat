@@ -274,6 +274,7 @@
       object-fit: cover;
       z-index: 50;
       display: none;
+      pointer-events: none;
     }
 
     .screen-shake {
@@ -392,6 +393,9 @@
       loop
       playsinline
       webkit-playsinline
+      x5-playsinline
+      x5-video-player-type="h5"
+      x5-video-player-fullscreen="false"
       preload="auto"
     ></video>
   </div>
@@ -405,6 +409,9 @@
     src="scare.mp4"
     playsinline
     webkit-playsinline
+    x5-playsinline
+    x5-video-player-type="h5"
+    x5-video-player-fullscreen="false"
     preload="auto"
   ></video>
 
@@ -423,6 +430,7 @@
       dirY: 1,
       trailTimer: 0,
       animId: null,
+      scareTimer: null,
     };
 
     const catContainer = document.getElementById('cat-container');
@@ -578,6 +586,17 @@
       }
     }
 
+    function onScareEnd() {
+      if (STATE.scareTimer) {
+        clearTimeout(STATE.scareTimer);
+        STATE.scareTimer = null;
+      }
+      body.classList.remove('screen-shake');
+      bloodFlash.classList.remove('blood-flash-active');
+      resetBtn.classList.add('show');
+      body.classList.remove('hide-cursor');
+    }
+
     function triggerJumpScare() {
       STATE.isHorror = true;
       horrorOverlay.classList.add('active');
@@ -599,7 +618,7 @@
           scareVideo.playbackRate = 2.0;
           const playPromise = scareVideo.play();
           if (playPromise !== undefined) {
-            playPromise.catch(err => {
+            playPromise.catch(() => {
               document.addEventListener('click', function onceClick() {
                 scareVideo.play();
                 document.removeEventListener('click', onceClick);
@@ -609,21 +628,21 @@
           body.classList.add('screen-shake');
           bloodFlash.classList.add('blood-flash-active');
           body.classList.add('hide-cursor');
+          STATE.scareTimer = setTimeout(onScareEnd, 2500);
         }, 200);
       }, 800);
     }
 
-    scareVideo.addEventListener('ended', () => {
-      body.classList.remove('screen-shake');
-      bloodFlash.classList.remove('blood-flash-active');
-      resetBtn.classList.add('show');
-      body.classList.remove('hide-cursor');
-    });
+    scareVideo.addEventListener('ended', onScareEnd);
 
     function resetGame() {
       STATE.clickCount = 0;
       STATE.isHorror = false;
       STATE.isPaused = false;
+      if (STATE.scareTimer) {
+        clearTimeout(STATE.scareTimer);
+        STATE.scareTimer = null;
+      }
       scareVideo.style.display = 'none';
       scareVideo.pause();
       scareVideo.currentTime = 0;
